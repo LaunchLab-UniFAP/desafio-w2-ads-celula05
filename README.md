@@ -42,9 +42,9 @@ O uso de ferramentas de IA (como ChatGPT, GitHub Copilot ou Claude) no LaunchLab
 Instrução: Edite as seções abaixo preenchendo as evidências críticas da dupla até o prazo limite estipulado no ciclo semanal.
 ## 📂 Identificação
 
-* Curso: [Sistemas de Informação / ADS]
-* Membro 1 (Nome & GitHub): @PedroLuucas - Pedro Lucas Pereira Silva
-* Membro 2 (Nome & GitHub): @iltan483 - Iltan Brito Teixeira
+* Curso: Análise e Desenvolvimento de Sistemas (ADS) e Sistemas de Informação (SI)
+* Membro 1 (Nome & GitHub): @PedroLuucas - Pedro Lucas Pereira Silva — ADS
+* Membro 2 (Nome & GitHub): @iltan483 - Iltan Brito Teixeira — SI
 * Embaixador Vinculado: @The-Saul - Saul Damasceno Gonçalves
 
 ## 🌍 Seção de Análise Crítica (Formação Geral)
@@ -55,12 +55,31 @@ Com base no cenário proposto da semana, descreva qual o impacto humano, social,
 ## 💻 Seção de Engenharia e Governança de TI
 
 Justifique a decisão de arquitetura técnica adotada pela célula nesta entrega. Como as regras de negócio de ADS e as estruturas de dados de SI foram construidas para garantir que a solução seja escalável e de fácil manutenção?
-💬 RESPOSTA DA CÉLULA: [Escreva sua justificativa técnica aqui]
+💬 RESPOSTA DA CÉLULA:
+
+A prioridade foi deixar o motor fácil de alterar e manter sem comprometer seu funcionamento, principalmente porque parâmetros como o limite da frota e o piso de ociosidade representam regras de negócio que podem mudar com o tempo.
+
+Para mudar o limite de 50 para 70, basta alterar o valor da constante `LIMITE_MAXIMO_M3` no início do arquivo, sem precisar procurar dentro da lógica da função. A diferença em relação ao template é que agora esse valor está como uma constante de módulo, seguindo a convenção de maiúsculas do Python, e também pode ser importado por outros módulos. Porém, percebi que o valor 50 também está definido no `governanca_si.py`, então o ideal seria centralizar essa configuração em um único lugar para evitar que os dois arquivos fiquem com valores diferentes — o que faria o motor considerar 70 m³ enquanto a auditoria ainda calcularia a ociosidade sobre 50 m³.
+
+Separar o `print` do laço deixa a lógica mais organizada, porque primeiro o código percorre os dados e define se o limite foi atingido, e só depois informa o resultado final. Isso evita que a mensagem de status fique misturada com as mensagens de processamento. A ordem não é exigida pelo teste automatizado, mas colocar o `Volume Total` antes do `Status` deixa a saída de acordo com o formato descrito no enunciado e mais previsível para uma automação que precise consumir esses dados.
+
+A trava de 1000 leituras foi mantida como proteção adicional. Hoje ela pode não ser atingida por causa das outras condições de parada, mas se alguém alterar uma delas no futuro, por exemplo trocando o `>=` por `==`, o laço poderia não parar quando o volume ultrapassasse o limite. Nesse caso, a trava garante que o processo tenha um limite máximo de execução. Ela custa apenas uma variável e uma comparação, enquanto evita o risco de um processo ficar executando indefinidamente e consumindo recursos, principalmente em um servidor.
+
+[SI — a preencher: justificativa das estruturas de dados do `governanca_si.py` (dicionário de metadados de compliance) sob a mesma ótica de escalabilidade e manutenção]
 
 ## 🛠️ Diário de Bordo da Bancada
 
-* Maior travamento técnico superado pela dupla durante a semana: [Relate aqui]
-* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a célula: [Relate aqui]
+* Maior travamento técnico superado pela dupla durante a semana:
+
+Considerando a dificuldade de diagnóstico, o maior travamento foi entender o problema do `EOFError`. O problema do nome do arquivo foi identificado de forma imediata ao comparar o workflow com o conteúdo do `src/`, enquanto o `EOFError` exigiu ler o tratamento de exceções e perceber que o `except` capturava apenas `ValueError`. Depois confirmei a hipótese reproduzindo o cenário com `"20" | python src/coleta_ads.py`, que gerou o traceback.
+
+* Como a intervenção ou a Issue aberta para o Embaixador ajudou a destravar a célula:
+
+Não abrimos Issue para o Embaixador nesta semana. Foi possível resolver os problemas analisando diretamente o código e o CI, identificando primeiro o problema do nome do arquivo e depois a lacuna no tratamento de exceções, reproduzindo os cenários localmente e validando as correções.
+
+* Declaração de uso de IA:
+
+A IA foi utilizada durante o trabalho, inclusive para geração de código, além de explicação de conceitos e apoio na análise.
 
 
 
